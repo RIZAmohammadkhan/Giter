@@ -1,0 +1,55 @@
+{
+  "name": "giter",
+  "version": "0.1.0",
+  "description": "An autonomous, AI-powered Git CLI agent for natural language repository operations.",
+  "module": "src/cli.ts",
+  "type": "module",
+  "bin": {
+    "giter": "./src/cli.ts"
+  },
+  "files": [
+    "src",
+    "docs",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "bun run src/cli.ts",
+    "dev": "bun --watch src/cli.ts",
+    "setup": "bun run src/cli.ts setup",
+    "doctor": "bun run src/cli.ts doctor",
+    "typecheck": "bunx tsc --noEmit",
+    "test": "bun test",
+    "build": "bun build ./src/cli.ts --target bun --outfile ./dist/giter.js"
+  },
+  "keywords": [
+    "git",
+    "cli",
+    "ai",
+    "agent",
+    "bun",
+    "typescript"
+  ],
+  "author": "Riza",
+  "license": "MIT",
+  "engines": {
+    "bun": ">=1.3.12"
+  },
+  "devDependencies": {
+    "@types/bun": "1.3.12",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.71",
+    "@ai-sdk/google": "^3.0.64",
+    "@ai-sdk/groq": "^3.0.35",
+    "@ai-sdk/openai": "^3.0.53",
+    "@ai-sdk/openai-compatible": "^2.0.41",
+    "@inquirer/prompts": "^8.4.1",
+    "ai": "^6.0.168",
+    "boxen": "^8.0.1",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "ora": "^9.3.0",
+    "zod": "^4.3.6"
+  }
+}

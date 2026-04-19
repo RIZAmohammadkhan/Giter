@@ -63,21 +63,6 @@ export async function handleNaturalLanguageCommand(options: {
   const gitStatus = await ensureGitAvailable();
   reporter.succeed(gitStatus.installedNow ? `Installed ${gitStatus.version}` : `Using ${gitStatus.version}`);
 
-  const request =
-    options.requestParts.join(" ").trim() ||
-    (process.stdout.isTTY
-      ? (
-          await input({
-            message: "What should Giter do in this folder?",
-            validate: (value) => (value.trim().length > 0 ? true : "Enter a request for Giter."),
-          })
-        ).trim()
-      : "");
-
-  if (!request) {
-    throw new Error("No natural-language request was provided.");
-  }
-
   if (!config) {
     reporter.info("First run detected. Launching setup wizard...");
     const setup = await runSetupWizard({ existingConfig: createDefaultConfig() });
@@ -85,30 +70,72 @@ export async function handleNaturalLanguageCommand(options: {
     reporter.printSetupComplete(config);
   }
 
-  reporter.start("Inspecting workspace state...");
-  const workspace = await getWorkspaceContext();
+  // If a request was passed inline (e.g. `giter tell me about ...`), use it for the first iteration
+  let request = options.requestParts.join(" ").trim();
+  const isInteractive = process.stdout.isTTY;
 
-  const providerOverride =
-    options.provider && isProviderId(options.provider) ? options.provider : undefined;
+  while (true) {
+    // Prompt if no request yet (first iteration with no args, or subsequent iterations)
+    if (!request) {
+      if (!isInteractive) {
+        // Non-TTY with no request: nothing to do
+        throw new Error("No natural-language request was provided.");
+      }
 
-  const { result, selection } = await runGiterAgent(
-    {
-      userPrompt: request,
-      config,
-      workspace,
-      providerOverride,
-      modelOverride: options.model,
-    },
-    reporter,
-  );
+      try {
+        request = (
+          await input({
+            message: "What should Giter do in this folder?",
+            validate: (value) => (value.trim().length > 0 ? true : "Enter a request for Giter."),
+          })
+        ).trim();
+      } catch {
+        // User pressed Ctrl+C during prompt
+        break;
+      }
+    }
 
-  const latestWorkspace = await getWorkspaceContext(workspace.cwd);
-  reporter.succeed("Task complete.");
-  reporter.printRunSummary({
-    workspace: latestWorkspace,
-    providerLabel: selection.providerLabel,
-    modelId: selection.modelId,
-    summary: result.text,
-    steps: result.steps.length,
-  });
+    // Allow the user to exit the loop
+    if (/^(exit|quit|q)$/i.test(request)) {
+      reporter.info("Goodbye!");
+      break;
+    }
+
+    reporter.start("Inspecting workspace state...");
+    const workspace = await getWorkspaceContext();
+
+    const providerOverride =
+      options.provider && isProviderId(options.provider) ? options.provider : undefined;
+
+    const { result, selection } = await runGiterAgent(
+      {
+        userPrompt: request,
+        config,
+        workspace,
+        providerOverride,
+        modelOverride: options.model,
+      },
+      reporter,
+    );
+
+    const latestWorkspace = await getWorkspaceContext(workspace.cwd);
+    reporter.succeed("Task complete.");
+    reporter.printRunSummary({
+      workspace: latestWorkspace,
+      providerLabel: selection.providerLabel,
+      modelId: selection.modelId,
+      summary: result.text,
+      steps: result.steps.length,
+    });
+
+    // Clear request so the prompt is shown again on the next iteration
+    request = "";
+
+    // If invoked non-interactively (e.g. piped input), run only once
+    if (!isInteractive) {
+      break;
+    }
+
+    console.log(); // blank line before next prompt
+  }
 }

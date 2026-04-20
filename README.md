@@ -21,7 +21,7 @@ Giter is an autonomous Git CLI agent built with Bun, TypeScript, and the Vercel 
 ## Install
 
 ```bash
-bun add -g giter
+bun install -g .
 ```
 
 This project is built for Bun. The published CLI entrypoint uses a Bun shebang, so Bun should be available on the target machine.

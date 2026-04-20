@@ -20,11 +20,27 @@ Giter is an autonomous Git CLI agent built with Bun, TypeScript, and the Vercel 
 
 ## Install
 
+This project is built for Bun. Install Bun first, then install Giter globally from this folder.
+
+Linux/macOS (bash, zsh, fish):
+
 ```bash
-bun install -g .
+bun install -g "$PWD"
 ```
 
-This project is built for Bun. The published CLI entrypoint uses a Bun shebang, so Bun should be available on the target machine.
+Windows PowerShell:
+
+```powershell
+bun install -g $PWD.Path
+```
+
+Windows Command Prompt (cmd.exe):
+
+```bat
+bun install -g "%cd%"
+```
+
+Using an absolute path is recommended for Bun global installs and is more reliable than `bun install -g .`.
 
 ## Quick Start
 
@@ -32,6 +48,8 @@ This project is built for Bun. The published CLI entrypoint uses a Bun shebang, 
 bun install
 bun run src/cli.ts setup
 ```
+
+On Windows, run the same commands in PowerShell or cmd.
 
 Then, in any folder:
 

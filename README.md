@@ -1,6 +1,6 @@
 # Giter
 
-Giter is an autonomous Git CLI agent built with Bun, TypeScript, and the Vercel AI SDK. You tell it what you want in plain English, and it works through the Git and file-level steps needed to get there, including merge-conflict cleanup.
+Giter is an autonomous Git CLI agent built with Bun, TypeScript, and the Vercel AI SDK. It is built to save tokens by treating each query as independent, so it does not need full codebase context to operate; that can significantly reduce costs when deployed correctly. You tell it what you want in plain English, and it works through the Git and file-level steps needed to get there, including merge-conflict cleanup.
 
 ## Why Giter
 
